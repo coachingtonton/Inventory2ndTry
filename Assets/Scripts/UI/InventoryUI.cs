@@ -1,5 +1,10 @@
 using UnityEngine;
 
+/// <summary>
+///             TODO 
+///             when inventory is opened, player can simoltaniously attack and move items around
+/// </summary>
+
 public class InventoryUI : MonoBehaviour
 {
     public GameObject bagPanel;

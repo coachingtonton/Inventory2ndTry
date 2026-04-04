@@ -63,6 +63,20 @@ public class Inventory : MonoBehaviour
         equippedSlot = slot;
     }
 
+    public void SwapBagSlots(int bagSlotA, int bagSlotB)
+    {
+        ItemSO temp = bag[bagSlotA];
+        bag[bagSlotA] = bag[bagSlotB];
+        bag[bagSlotB] = temp;
+    }
+
+    public void MoveToInventory(int hotbarIndex, int bagIndex)
+    {
+        ItemSO temp = hotbar[hotbarIndex];
+        hotbar[hotbarIndex] = bag[bagIndex];
+        bag[bagIndex] = temp;
+    }
+
     public ItemSO GetActiveItem()
     {
         // picks index in hotbar based off equipped slot

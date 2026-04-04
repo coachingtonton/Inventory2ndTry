@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class SlotUI : MonoBehaviour
+public class SlotUI : MonoBehaviour, IPointerClickHandler
 {
     public Image icon;
     public TextMeshProUGUI countText;
@@ -31,5 +32,10 @@ public class SlotUI : MonoBehaviour
             icon.enabled = false;
             countText.enabled = false;
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        InventoryDragManager.Instance.SlotClicked(this);
     }
 }
