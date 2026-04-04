@@ -2694,7 +2694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 0.89423037, g: 1, b: 0.06132078, a: 0.50980395}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2950,6 +2950,7 @@ GameObject:
   - component: {fileID: 929933624}
   - component: {fileID: 929933625}
   - component: {fileID: 929933626}
+  - component: {fileID: 929933627}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3148,6 +3149,11 @@ MonoBehaviour:
   gravityFlipPressed: 0
   reloadPressed: 0
   iKeyPressed: 0
+  zKeyPressed: 0
+  xKeyPressed: 0
+  cKeyPressed: 0
+  vKeyPressed: 0
+  bKeyPressed: 0
   onePressed: 0
   twoPressed: 0
   threePressed: 0
@@ -3230,6 +3236,11 @@ MonoBehaviour:
   gravityFlipPressed: 0
   reloadPressed: 0
   iKeyPressed: 0
+  zKeyPressed: 0
+  xKeyPressed: 0
+  cKeyPressed: 0
+  vKeyPressed: 0
+  bKeyPressed: 0
   onePressed: 0
   twoPressed: 0
   threePressed: 0
@@ -3251,6 +3262,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4d1698ba97647a428ecf37706fb1ed3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentManager
+--- !u!114 &929933627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929933617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02189c465fb635f4798d15a81a58c257, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+  health:
+    current: 100
+    max: 100
+    regenRate: 33.61
+  mana:
+    current: 75
+    max: 75
+    regenRate: 0
 --- !u!1001 &933042724
 PrefabInstance:
   m_ObjectHideFlags: 0

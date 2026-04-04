@@ -15,6 +15,13 @@ public class InputManager : MonoBehaviour
     public bool reloadPressed;
 
     public bool iKeyPressed;
+    public bool zKeyPressed;
+    public bool xKeyPressed;
+    public bool cKeyPressed;
+    public bool vKeyPressed;
+    public bool bKeyPressed;
+
+
 
     public bool onePressed;
     public bool twoPressed;
@@ -42,7 +49,14 @@ public class InputManager : MonoBehaviour
         pausePressed = Input.GetKeyDown(KeyCode.Escape);
         gravityFlipPressed = Input.GetKeyDown(KeyCode.G);
         reloadPressed = Input.GetKeyDown(KeyCode.R);
+        
         iKeyPressed = Input.GetKeyDown(KeyCode.I);
+        zKeyPressed = Input.GetKeyDown(KeyCode.Z);
+        xKeyPressed = Input.GetKeyDown(KeyCode.X);
+        cKeyPressed = Input.GetKeyDown(KeyCode.C);
+        vKeyPressed = Input.GetKeyDown(KeyCode.V);
+        bKeyPressed = Input.GetKeyDown(KeyCode.B);
+
 
         onePressed = Input.GetKeyDown(KeyCode.Alpha1);
         twoPressed = Input.GetKeyDown(KeyCode.Alpha2);
