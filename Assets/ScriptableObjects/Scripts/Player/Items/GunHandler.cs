@@ -35,7 +35,6 @@ public class GunHandler : WeaponBase
             float bulletSpreadRange = Random.Range(-gunData.spread, gunData.spread);
             SpawnProjectile(bulletSpreadRange);
         }
-
     }
 
     public override void SecondaryFire()
@@ -50,7 +49,7 @@ public class GunHandler : WeaponBase
 
     void SpawnProjectile(float angle)
     {
-        Vector2 direction = Quaternion.Euler(0, 0, angle) * transform.right;
+        Vector2 direction = Quaternion.Euler(0, 0, angle) * firePoint.right;
         GameObject bullet = Instantiate(gunData.projectilePrefab, firePoint.position, Quaternion.identity);
         bullet.GetComponent<Projectile>().Init(direction, gunData.projectileSpeed, gunData.damage);
     }

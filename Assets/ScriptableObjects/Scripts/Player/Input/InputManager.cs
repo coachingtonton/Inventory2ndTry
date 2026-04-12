@@ -20,6 +20,8 @@ public class InputManager : MonoBehaviour
     public bool cKeyPressed;
     public bool vKeyPressed;
     public bool bKeyPressed;
+    public bool tabHeld;
+
 
 
 
@@ -40,6 +42,7 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
+        tabHeld = Input.GetKey(KeyCode.Tab);
         moveInput = Input.GetAxisRaw("Horizontal");
         jumpPressed = Input.GetKeyDown(KeyCode.Space);
         dashPressed = Input.GetKeyDown(KeyCode.LeftShift);
