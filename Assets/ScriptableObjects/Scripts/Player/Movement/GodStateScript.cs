@@ -10,16 +10,14 @@ using System.Collections;
 /// PLAYER CONTROLLER HOLDS THE DATA, THE GODSTATE SCRIPT PUTS 
 /// THE DATA TO WORK IN ACCORDANCE TO THE STATE PLAYER IS IN 
 /// </summary>
-public class GodStateScript: MonoBehaviour
+public class GodStateScript : MonoBehaviour
 {
 
 
 
 
-
-
     /// NORMAL STATE NORMAL STATE NORMAL STATE NORMAL STATE NORMAL STATE NORMAL STATE 
-    public class NormalState : IState                   
+    public class NormalState : IState
     {
         private PlayerStateController player;
 
@@ -39,7 +37,7 @@ public class GodStateScript: MonoBehaviour
             player.FlipSpriteToPlayerInput();
 
             //Basic left right movement
-            player.rb.linearVelocity = new Vector2(player.moveInput * player.moveSpeed, player.rb.linearVelocity.y);
+            player.ApplyHorizontalMovement(player.groundAcceleration, player.groundDeceleration);
 
             //if (player.isGrounded && InputManager.Instance.jumpPressed)
             //{ // jump logic
@@ -78,7 +76,7 @@ public class GodStateScript: MonoBehaviour
         public void Enter()
         {
             // execute the jump
-            player.rb.linearVelocity = new Vector2(player.rb.linearVelocity.x, player.jumpHeight);
+            player.rb.linearVelocity = new Vector2(player.rb.linearVelocity.x, player.jumpForce);
             Debug.Log("ENTERED JUMP STATE");
         }
 
@@ -124,17 +122,14 @@ public class GodStateScript: MonoBehaviour
         public void Exit()
         {
             // restore gravity when leaving
-            player.rb.gravityScale = 1f;
+            player.rb.gravityScale = player.regularGravity;
             Debug.Log("EXITED FLOAT STATE");
         }
 
         public void Update()
         {
             // horizontal control while floating, slightly boosted
-            player.rb.linearVelocity = new Vector2(
-                player.moveInput * player.moveSpeed * player.floatHorizontalSpeed,
-                player.rb.linearVelocity.y // preserve Y so momentum carries up
-            );
+            player.ApplyHorizontalMovement(player.airControl, player.airDrag);
 
             if (player.rb.linearVelocity.y > 0)
             {// slow the upward momentum gradually so it feels like floating not flying
@@ -178,14 +173,155 @@ public class GodStateScript: MonoBehaviour
         public void Update()
         {
             // HORIZONTAL AIR MOVEMENT 
-            player.rb.linearVelocity = new Vector2(player.moveInput * player.moveSpeed 
-                * player.airMovementResistence, player.rb.linearVelocity.y);
+            player.ApplyHorizontalMovement(player.airControl, player.airDrag);
 
             if (InputManager.Instance.jumpPressed && jumpsRemaining > 0)
             { // PREFORMS DOUBLE JUMP 
-                player.rb.linearVelocity = new Vector2(player.rb.linearVelocity.x, player.jumpHeight);
+                player.rb.linearVelocity = new Vector2(player.rb.linearVelocity.x, player.jumpForce);
                 jumpsRemaining--;
+            }
+            if (player.rb.linearVelocity.y < 0)
+            {
+                player.rb.AddForce(Vector2.down * player.fallMultiplier, ForceMode2D.Force);
             }
         }
     } /// FALLING STATE FALLING FALLING FALLING FALLINGFALLING STATE FALLING FALLING FALLING FALLINGFALLING STATE FALLING FALLING FALLING FALLING
+
+
+    /// WALL JUMPING STATES WALL JUMPING STATES WALL JUMPING STATES WALL JUMPING STATES WALL JUMPING STATES 
+    public class TouchingWallStates : IState
+    {
+        /// <summary>
+        /// TODO 
+        /// figure out moementum system for wall kick 
+        /// </summary>
+
+
+        private PlayerStateController player;
+
+        public TouchingWallStates(PlayerStateController player)
+        {
+            this.player = player;
+        }
+
+        public void Enter()
+        {
+            player.freezePlayerInputTimer = 0;
+            Debug.Log("ENTERED WALLTOUCHING STATE");
+        }
+
+        public void Exit()
+        {
+            player.repeatingWallJump = false;
+            player.kicksOffWall = false;
+        }
+
+        public void Update()
+        {
+            inputComboninations();
+            WallInputLogic();
+        }
+
+        public void inputComboninations()
+        {
+            if (player.holdingIntoWall && InputManager.Instance.wKeyHeld
+                && InputManager.Instance.spaceHeld)
+            {
+                player.repeatingWallJump = true;
+                return;
+            }
+
+            if (player.holdingIntoWall && InputManager.Instance.jumpPressed
+                && player.repeatingWallJump == false
+                )
+            {
+                player.kicksOffWall = true;
+                return;
+            }
+        }
+
+        public void WallInputLogic()
+        {
+            if (player.repeatingWallJump)
+            {   // Runs repeatingwalljump COROUTINE 
+                player.repeatingWallJump = false; // add this
+                player.StartRepeatingWallJump();
+            }
+
+            if (player.kicksOffWall)
+            {   // IF THE PLAYER HOLDS INTO WALL AND PRESSES JUMP STRONG
+                // HORIZONTAL JUMP HAPPENS. IMAGINE KICKING OFF A WALL 
+                // PLAYER FREEZE TIMER IS PRESENT AS HORIZONTAL JUMP 
+                // CAN BE EASILY CUTOFF EARLY BY PLAYER INPUT 
+                // REFACTOR LATER
+
+                player.freezePlayerInputTimer = player.freezePlayerInputDuration;
+
+                player.rb.linearVelocity = Vector2.zero;
+                player.rb.AddForce(new Vector2(
+                    -player.moveInput * player.powerKickForceX,
+                    player.powerKickForceY
+                ), ForceMode2D.Impulse);
+                player.kicksOffWall = false;
+                return;
+            }
+
+            if (InputManager.Instance.jumpPressed)
+            { 
+                player.rb.linearVelocity = Vector2.zero;
+                player.rb.AddForce(new Vector2(player.wallJumpDirection * player.climbJumpForceX,
+                    player.climbJumpForceY), ForceMode2D.Impulse);
+
+                return;
+            }
+        }/// wWALL JUMPING STATES WALL JUMPING STATES WALL JUMPING STATES WALL JUMPING STATES 
+    }
+
+    public class WallSlideState : IState
+    {
+
+        private PlayerStateController player;
+
+        public WallSlideState(PlayerStateController player) 
+        {
+            this.player = player;
+        }
+
+        public void Enter()
+        {
+            player.wallSlideTimer = 0f;
+            Debug.Log("ENTERED WALL SLIDE");
+        }
+
+        public void Exit()
+        {
+            Debug.Log("ENTERED WALL SLIDE");
+        }
+
+        public void Update()
+        {
+            player.diggingInWall = player.holdingIntoWall;
+            //PLAYERSLIDEMAXSEPEED DETERMINES HOW MUCH TIME TO REACH MAX FALL SPEED
+
+            player.wallSlideTimer += Time.deltaTime;
+
+            float currentSlideSpeed = Mathf.Lerp(player.wallSlideSpeed, player.wallSlideMaxSpeed,
+                player.wallSlideTimer / player.wallSlideTimerDuration);
+            //A LERP TO ALLOW PLAYER TO GARDUALLY INCREASE DESCENSION SPEED WHILE ON WALL 
+
+            if (player.rb.linearVelocity.y < player.wallSlideSpeed)
+            {
+                player.rb.linearVelocity = new Vector2(player.rb.linearVelocity.x, currentSlideSpeed);
+                //APLLIES CURRENSLIDE SPEED
+
+                if (player.diggingInWall)
+                {
+                    // IF PLAYER IS DIGGING INTO WALL SLOWS DOWN SLIDE SPEED BY 2
+                    player.rb.linearVelocity = new Vector2(player.rb.linearVelocity.x, currentSlideSpeed / 2);
+                }
+            }
+
+        }
+    }
 }
+

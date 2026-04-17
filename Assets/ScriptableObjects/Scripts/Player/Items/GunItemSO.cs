@@ -11,5 +11,6 @@ public class GunItemSO : ItemSO
     public float projectileSpeed;
     public int magSize;
     public float reloadTime;
+    public float fireRate;
     public int weaponDamage;
 }

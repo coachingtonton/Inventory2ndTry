@@ -13,6 +13,10 @@ public class InputManager : MonoBehaviour
     public bool pausePressed;
     public bool gravityFlipPressed;
     public bool rPressed;
+    public bool bkeyHeld;
+    public bool spaceHeld;
+    public bool wKeyHeld;
+
 
     public bool iKeyPressed;
     public bool zKeyPressed;
@@ -21,9 +25,10 @@ public class InputManager : MonoBehaviour
     public bool vKeyPressed;
     public bool bKeyPressed;
     public bool tabHeld;
+    public bool wKeyPressed;
 
-
-
+    public bool cntrlPressed;
+    public float moveInputY;
 
     public bool onePressed;
     public bool twoPressed;
@@ -42,7 +47,11 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
+        wKeyHeld = Input.GetKey(KeyCode.W);
+        spaceHeld = Input.GetKey(KeyCode.Space);
+        bkeyHeld = Input.GetKey(KeyCode.B);
         tabHeld = Input.GetKey(KeyCode.Tab);
+        moveInputY = Input.GetAxisRaw("Vertical");
         moveInput = Input.GetAxisRaw("Horizontal");
         jumpPressed = Input.GetKeyDown(KeyCode.Space);
         dashPressed = Input.GetKeyDown(KeyCode.LeftShift);
@@ -52,6 +61,7 @@ public class InputManager : MonoBehaviour
         pausePressed = Input.GetKeyDown(KeyCode.Escape);
         gravityFlipPressed = Input.GetKeyDown(KeyCode.G);
         rPressed = Input.GetKeyDown(KeyCode.R);
+
         
         iKeyPressed = Input.GetKeyDown(KeyCode.I);
         zKeyPressed = Input.GetKeyDown(KeyCode.Z);
@@ -60,6 +70,9 @@ public class InputManager : MonoBehaviour
         vKeyPressed = Input.GetKeyDown(KeyCode.V);
         bKeyPressed = Input.GetKeyDown(KeyCode.B);
 
+        wKeyPressed = Input.GetKeyDown(KeyCode.W);
+
+        cntrlPressed = Input.GetKeyDown(KeyCode.LeftControl);
 
         onePressed = Input.GetKeyDown(KeyCode.Alpha1);
         twoPressed = Input.GetKeyDown(KeyCode.Alpha2);

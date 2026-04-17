@@ -10,7 +10,6 @@ public class ItemSO : ScriptableObject
     public ItemType itemType;
     public WeaponType weaponType;
     public int damage;
-    public float fireRate;
     public bool isStackable;
     [TextArea] public string description;
 

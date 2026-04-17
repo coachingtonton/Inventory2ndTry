@@ -31,8 +31,10 @@ public class Projectile : MonoBehaviour
     {
         // try to find a damageable component on whatever we hit
         // we havent built this yet — placeholder for now
-        Debug.Log("Hit: " + other.gameObject.name);
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player")) return;
 
+        Debug.Log("Hit: " + other.gameObject.name);
+            
         Destroy(gameObject);
     }
 }

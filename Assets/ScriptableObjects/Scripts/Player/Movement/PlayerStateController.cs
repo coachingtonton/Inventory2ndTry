@@ -6,39 +6,98 @@ public class PlayerStateController : MonoBehaviour
 {
     public IState currentState { get; private set; }
 
-    [Header("Movement Values")]
-    public int jumpHeight = 12;
-    public int moveSpeed = 12;
-    public float moveInput;
-    public float airMovementResistence;
+    private Coroutine repeatingWallJumpCoroutine;
 
-    [Header("IN AIR VALUES")]
-    public float floatGravity = 0.1f;
-    public float floatHorizontalSpeed = 1.2f;
+    [Header("Movement - Ground")]
+    public float maxSpeed = 10f;
+    public float groundAcceleration = 30f;
+    public float groundDeceleration = 40f;
+
+    [Header("Movement - Air")]
+    public float jumpForce = 12f;
+    public float airControl = 15f;
+    public float airDrag = 10f;
+    public float fallMultiplier = 2.5f;
+    public float maxFallSpeed = -15f;
     public int DBLjumpsRemaining = 3;
     public int currentJumps;
+    public int regularGravity;
 
+    [Header("Movement - Float")]
+    public float floatGravity = 0.1f;
+    public float floatHorizontalSpeed = 1.2f;
 
-    /// COMPONENT REFRENCES 
+    [Header("Movement - Wall")]
+    public float wallSlideSpeed = -2f;
+    public float wallSlideMaxSpeed = -10f;
+
+    public float climbJumpForceX = 3f;
+    public float climbJumpForceY = 18f;
+    public float powerKickForceX = 18f;
+    public float powerKickForceY = 10f;
+    public float diagonalJumpForceX = 10f;
+    public float diagonalJumpForceY = 10f;
+    public float wallDetachTime = 0.15f;
+
+    [Header("Movement - Dodge Roll")]
+    public float dodgeRollForce = 15f;
+    public float dodgeRollDuration = 0.4f;
+
+    [Header("Movement - Feel Polish")]
+    public float coyoteTime = 0.1f;
+    public float jumpBufferTime = 0.1f;
+    public float apexHangThreshold = 1f;
+    public float apexHangGravity = 0.4f;
+
+    [Header("Input")]
+    public float moveInput;
+    public float moveInputY;
+    public bool isFloatingTabHeld;
+
+    [Header("Timers")]
+    public float coyoteTimer;
+    public float jumpBufferTimer;
+    public float wallDetachTimer;
+    public float dodgeRollTimer;
+    public float freezePlayerInputTimer;
+    public float freezePlayerInputDuration;
+
+    public float wallSlideTimer;
+    public float wallSlideTimerDuration;
+
+    //public float wallClingTimer;
+    //public float wallClingDuration = 0.03f;
+
+    [Header("Status")]
+
+    public bool isDodgeRolling;
+    public bool isGravityFlipped;
+    public bool holdingIntoWall;
+    public bool repeatingWallJump;
+    public bool kicksOffWall;
+    public bool diggingInWall;
+
+    /// COMPONENT REFERENCES
     [SerializeField] Transform wallCheckFront;
     [SerializeField] Transform wallCheckRear;
     [SerializeField] Transform groundCheck;
     [SerializeField] LayerMask groundLayer;
     public Rigidbody2D rb;
 
-    /// ALL STATE REFRENCES 
+    /// STATE REFERENCES
+    public WallSlideState wallSlideState;
     public FallingState fallingState;
     public NormalState normalState;
     public JumpingState jumpingState;
     public FloatState floatState;
+    public TouchingWallStates touchingWallState;
 
-
-    /// ALL DATA CHECKS 
+    /// DATA CHECKS
     public bool isGrounded { get; private set; }
     public bool wallTouchingRear { get; private set; }
-    public bool wallTouchingFront  { get; private set; }
+    public bool wallTouchingFront { get; private set; }
     public bool isTouchingWall { get; private set; }
-    public bool isFloatingTabHeld;
+    public float wallJumpDirection;
 
 
     private void Awake()
@@ -51,7 +110,7 @@ public class PlayerStateController : MonoBehaviour
         currentJumps = DBLjumpsRemaining;
         InitializeAllStatesOnStart();
 
-        rb.gravityScale = 1.0f;
+        rb.gravityScale = rb.gravityScale;
         currentState = normalState;
         currentState.Enter();//manualy calls enter on first state
 
@@ -59,6 +118,9 @@ public class PlayerStateController : MonoBehaviour
 
     private void Update()
     {
+        if (freezePlayerInputTimer > 0)//TIMER FOR PLAYER FREEZE 
+            freezePlayerInputTimer -= Time.deltaTime;
+
         ResetJumpsIfGrounded();
         isFloatingTabHeld = InputManager.Instance.tabHeld;//simple isfloatingscript
         moveInput = InputManager.Instance.moveInput;
@@ -82,10 +144,10 @@ public class PlayerStateController : MonoBehaviour
     { // SIMPLE switch for what causes a transition from one state to another
       // PLAYER STARTS IN NORMAL STATE  
       // 
-        
-switch (currentState)
-{
-/// =============NORMAL TRANSITIONS ============
+
+        switch (currentState)
+        {
+            /// =============NORMAL TRANSITIONS ============
             case NormalState:
                 if (InputManager.Instance.jumpPressed && isGrounded)
                     ChangeState(jumpingState);
@@ -93,33 +155,75 @@ switch (currentState)
                     ChangeState(fallingState); // walked off a ledge
                 if (isFloatingTabHeld)
                     ChangeState(floatState);
+                if ((isTouchingWall && !isGrounded))
+                    ChangeState(touchingWallState);
                 break;
 
 
-/// =============JUMPING TRANSITIONS ============
+            /// =============JUMPING TRANSITIONS ============
             case JumpingState:
                 ChangeState(fallingState);
-            break;
+                if (isTouchingWall)
+                    ChangeState(touchingWallState);
+                break;
 
 
-/// =============FLOATING TRANSITIONS ============
+
+            /// =============FLOATING TRANSITIONS ============
             case FloatState:
                 if (isFloatingTabHeld == false)
                     ChangeState(fallingState);
                 if (isGrounded)
                     ChangeState(normalState);
+                if (isTouchingWall)
+                    ChangeState(touchingWallState);
                 break;
 
 
-/// =============FALLING TRANSITIONS ============
+            /// =============FALLING TRANSITIONS ============
             case FallingState:
                 if (isGrounded == true)
                     ChangeState(normalState);
                 if (isFloatingTabHeld == true)
                     ChangeState(floatState);
+                if (isTouchingWall)
+                    ChangeState(touchingWallState);
+                break;
+
+            /// ============= TOUCHING WALL STATE ============
+            case TouchingWallStates:
+                if (!isTouchingWall && !repeatingWallJump)
+                    ChangeState(fallingState);
+                if (isGrounded)
+                    ChangeState(normalState);
+                if (!holdingIntoWall && isTouchingWall)  // not holding in = start sliding
+                    ChangeState(wallSlideState);
+                break;
+
+                /// ============= WALL SLIDING STATE ============
+             case WallSlideState:
+                if (!isTouchingWall)
+                    ChangeState(fallingState);
+                if (isGrounded)
+                    ChangeState(normalState);
+                if (InputManager.Instance.jumpPressed)
+                    ChangeState(touchingWallState);
+                if (moveInput != 0 && !holdingIntoWall)  // tap opposite direction = leave wall
+                    ChangeState(fallingState);
                 break;
         }
     }
+
+    public void InitializeAllStatesOnStart()
+    {
+        wallSlideState = new WallSlideState(this);
+        fallingState = new FallingState(this);
+        normalState = new NormalState(this);
+        jumpingState = new JumpingState(this);
+        floatState = new FloatState(this);
+        touchingWallState = new TouchingWallStates(this);
+    }
+
 
     public void SurfaceChecks()
     {
@@ -129,7 +233,12 @@ switch (currentState)
         wallTouchingFront = Physics2D.OverlapCircle(wallCheckFront.position, 0.15f, groundLayer);
         wallTouchingRear = Physics2D.OverlapCircle(wallCheckRear.position, 0.15f, groundLayer);
         isTouchingWall = wallTouchingFront || wallTouchingRear;
+
+        holdingIntoWall = isTouchingWall && moveInput == 1 || isTouchingWall && moveInput == -1;
+        if (isTouchingWall)
+            wallJumpDirection = wallTouchingFront ? -1f : 1f;
     }
+
 
     public void FlipSpriteToPlayerInput()
     {   //SIMPLPE player flip script, ALSO Records player input horizontal
@@ -145,13 +254,6 @@ switch (currentState)
         }
     }
 
-    public void InitializeAllStatesOnStart()
-    {
-        fallingState = new FallingState(this);
-        normalState = new NormalState(this);
-        jumpingState = new JumpingState(this);
-        floatState = new FloatState(this);
-    }
 
     public void ResetJumpsIfGrounded()
     {// PROTOTYPE SYSTEM FOR RESETTING JUMPS FOR NOW
@@ -159,5 +261,53 @@ switch (currentState)
         {
             currentJumps = DBLjumpsRemaining;
         }
+    }
+
+    public void ApplyHorizontalMovement(float accel, float decel)
+    {
+        if (freezePlayerInputTimer > 0) return; // stops player from moving 
+        // used when states require p[layer input to be temporarily locked 
+
+
+        //METHOD FOR APPLYING HORIZONTAL MOVEMENT CONTEXTUALLY 
+        // can be used for air, water or whateeever 
+        float targetSpeed = moveInput * maxSpeed;
+        float speedDiff = targetSpeed - rb.linearVelocity.x;
+
+        float rate = (Mathf.Abs(targetSpeed) > 0.01f) ? accel : decel;//IF VELOCITY X IS MORE THAN 0.01 THAN RATE = ACCEL
+
+        float force = speedDiff * rate;
+        rb.AddForce(Vector2.right * force, ForceMode2D.Force);
+    }
+
+    public void StartRepeatingWallJump()
+    {
+        {
+            if (repeatingWallJumpCoroutine != null)
+                StopCoroutine(repeatingWallJumpCoroutine);
+            repeatingWallJumpCoroutine = StartCoroutine(RepeatingWallJumpLoop());
+        }
+    }
+
+    private IEnumerator RepeatingWallJumpLoop()
+    {   // REPEATS UPWARD WALL JUMP WHILE THE PLAYER IS 
+        // HOLDING SPACE, 
+        // YIELD RETURN NEW WAIT UNTILL PREVENTS 
+        // PLAYER FROM ENTERING FALLING STATE ONCE
+        // CONTACT WITH THE WALL IS LOST.
+        // ONCE SPACE IS LET GO WALL JUMP REPEAT IS FALSE 
+        while (InputManager.Instance.spaceHeld)
+        {
+            if (isTouchingWall)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.AddForce(new Vector2(
+                    -moveInput * climbJumpForceX,
+                    climbJumpForceY
+                ), ForceMode2D.Impulse);
+            }
+            yield return new WaitUntil(() => isTouchingWall);
+        }
+        repeatingWallJump = false;
     }
 }

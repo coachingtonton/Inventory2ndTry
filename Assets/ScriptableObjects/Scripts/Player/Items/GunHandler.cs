@@ -50,7 +50,7 @@ public class GunHandler : WeaponBase
     void SpawnProjectile(float angle)
     {
         Vector2 direction = Quaternion.Euler(0, 0, angle) * firePoint.right;
-        GameObject bullet = Instantiate(gunData.projectilePrefab, firePoint.position, Quaternion.identity);
+        GameObject bullet = Instantiate(gunData.projectilePrefab, firePoint.position, firePoint.rotation);
         bullet.GetComponent<Projectile>().Init(direction, gunData.projectileSpeed, gunData.damage);
     }
 }
