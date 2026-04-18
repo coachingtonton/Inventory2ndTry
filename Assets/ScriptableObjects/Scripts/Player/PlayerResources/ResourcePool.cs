@@ -3,12 +3,15 @@ using System;
 
 [System.Serializable]
 public class ResourcePool
+
+    ///THIS HAS EVERY FUCKING RESOURCE CHECK YOU NEED 
+    ///WEAPONBASE HAS A PLAYERSTATS GETCOMPONENET ON AWAKE 
 {
     public float current;
     public float max;
     public float regenRate;
 
-    public event Action OnDepleted;
+    public event Action OnDepleted; /// REACTION WHEN RESOYURCE HITS ZERO 
     public event Action<float, float> OnChanged;
 
     public ResourcePool(float max)
@@ -17,7 +20,7 @@ public class ResourcePool
         this.current = max;
     }
 
-    public void Spend(float amount)
+    public void Spend(float amount) /// CONSUME THE RESOURECE 
     {
         current -= amount;
         if (current <= 0f)
@@ -27,7 +30,7 @@ public class ResourcePool
         }
         OnChanged?.Invoke(current, max);
     }
-    public void Gain(float amount)
+    public void Gain(float amount) /// GAIN THE RESOURCE 
     {
         current += amount;
         if (current > max)
@@ -35,12 +38,19 @@ public class ResourcePool
         OnChanged?.Invoke(current, max);
     }
 
-    public bool HasEnough(float amount)
+    public bool HasEnough(float amount) /// 
     {
         return current >= amount;
     }
 
-    public void Regen(float deltaTime)
+    public bool TrySpend(float amount) /// RUNS A CHECK FOR COST AND RUNS IF CAN AFFORD
+    {
+        if (current < amount) return false;
+        Spend(amount);
+        return true;
+    }
+
+    public void Regen(float deltaTime) 
     {
         if (regenRate > 0f && current < max)
             Gain(regenRate * deltaTime);

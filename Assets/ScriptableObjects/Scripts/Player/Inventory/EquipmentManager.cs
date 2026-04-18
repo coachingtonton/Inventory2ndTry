@@ -85,7 +85,7 @@ public class EquipmentManager : MonoBehaviour
         if (InputManager.Instance.ninePressed) Equip(8);
 
         // CURRENTLY EQUIPPED DATA HANDLERS METHODS 
-        if (equippedDataHandler != null && InputManager.Instance.firePressed)
+        if (equippedDataHandler != null && InputManager.Instance.fireHeld)
             equippedDataHandler.PrimaryFire();
         if (equippedDataHandler != null && InputManager.Instance.rPressed)
             equippedDataHandler.Reload();

@@ -19,7 +19,6 @@ public class GunHandler : WeaponBase
     {
         Debug.Log(fireTimer);
         fireTimer -= Time.deltaTime;
-
     }
 
     public override void PrimaryFire()
@@ -47,8 +46,9 @@ public class GunHandler : WeaponBase
         currentMag = gunData.magSize;
     }
 
-    void SpawnProjectile(float angle)
+   void SpawnProjectile(float angle)
     {
+        // FOLLOWS FIREPOINT AND INSTANTIATES PROJECTILE.
         Vector2 direction = Quaternion.Euler(0, 0, angle) * firePoint.right;
         GameObject bullet = Instantiate(gunData.projectilePrefab, firePoint.position, firePoint.rotation);
         bullet.GetComponent<Projectile>().Init(direction, gunData.projectileSpeed, gunData.damage);

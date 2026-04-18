@@ -26,6 +26,6 @@ public enum WeaponType
 {
     FireArm,
     Melee,
-    Magic,
+    Ability,
     Explosive,
 }
