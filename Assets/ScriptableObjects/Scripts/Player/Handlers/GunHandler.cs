@@ -17,7 +17,7 @@ public class GunHandler : WeaponBase
 
     private void Update()
     {
-        Debug.Log(fireTimer);
+        //Debug.Log(fireTimer);
         fireTimer -= Time.deltaTime;
     }
 

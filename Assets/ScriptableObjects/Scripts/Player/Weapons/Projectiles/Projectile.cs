@@ -20,20 +20,31 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
-    // Arguments for parameters are present inside Corresponding weaponSO
+    //GUNHANDLER IS gonna use this method
+    // the arguments are for the specific weapons qualities to 
+    // affect the bullets, ammo is the same, weapon determines damage
     public void Init(Vector2 direction, float speed, int damage)
     {
         rb.linearVelocity = direction * speed;
-        this.damage = damage;  // saves the parameter into the class field
+        this.damage = damage;  // THIS STORES GUNHANDLERS GUNITEM SO'S DAMAGE IN THIS 
+        // SCRIPT SO IT CAN BE USED BY OTHER METHODS 
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player")) return;
+        //cURRENTL in place to avoid bullet destroying when making player contact
+
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (damageable != null)
+        {
+            damageable.TakeDamage(damage);
+        }
+
         // try to find a damageable component on whatever we hit
         // we havent built this yet — placeholder for now
-        if (other.gameObject.layer == LayerMask.NameToLayer("Player")) return;
 
-        Debug.Log("Hit: " + other.gameObject.name);
+        Debug.Log($"DEALT {damage} TO {other.gameObject}");
             
         Destroy(gameObject);
     }

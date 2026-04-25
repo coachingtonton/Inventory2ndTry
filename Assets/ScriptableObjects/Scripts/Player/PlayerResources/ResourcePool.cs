@@ -11,6 +11,8 @@ public class ResourcePool
     public float max;
     public float regenRate;
 
+
+
     public event Action OnDepleted; /// REACTION WHEN RESOYURCE HITS ZERO 
     public event Action<float, float> OnChanged;
 
