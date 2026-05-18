@@ -74,6 +74,10 @@ public class EquipmentManager : MonoBehaviour
 
     private void Update()
     {
+        if ( equippedDataHandler != null &&
+            equippedDataHandler.weaponIsLockingOtherWeaponSelection()) return;
+        // blocks weapon selection when a weapon requires it
+
         if (InputManager.Instance.onePressed) Equip(0);
         if (InputManager.Instance.twoPressed) Equip(1);
         if (InputManager.Instance.threePressed) Equip(2);

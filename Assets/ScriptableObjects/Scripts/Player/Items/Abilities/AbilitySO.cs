@@ -16,9 +16,10 @@ public class AbilitySO : ItemSO
     public float resourceCost;
 
     [Header("Projectile")]
+    public int projectileSize;
     public GameObject projectilePrefab;
-    public float fireRate;
     public float projectileSpeed;
+    public float projectileGravity;
     public int projectileCount;
     public float spread;
 

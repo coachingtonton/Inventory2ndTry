@@ -19,7 +19,6 @@ public class HitBoxTest : MonoBehaviour
     public float directionY;
     public float directionX;
 
-
     public void Start()
     {
         canAttack = true;
@@ -42,7 +41,6 @@ public class HitBoxTest : MonoBehaviour
         {
             return;
         }
-
     }
 
     void OnDrawGizmos()

@@ -20,11 +20,13 @@ MonoBehaviour:
   damage: 15
   isStackable: 0
   description: 
-  attackDuration: 1
-  windupHitBoxDelay: 1
-  hitboxDuration: 1
-  cooldown: 0
-  hitboxSize: {x: 50, y: 50}
-  hitboxOffset: {x: 50, y: 50}
-  knockbackForce: 0
+  attackDuration: 0.47
+  windupHitBoxDelay: 0
+  hitboxDuration: -0.05
+  cooldown: 0.4
+  hitboxSize: {x: 2, y: 2}
+  hitboxOffset: {x: 0, y: 0}
+  hasKnockback: 1
+  knockbackForceX: 42.7
+  knockbackForceY: 31.3
   appliedBuff: {fileID: 0}

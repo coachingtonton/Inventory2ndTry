@@ -13,12 +13,23 @@ public class MeleeItemSO : ItemSO
     public float hitboxDuration;    // how long hitbox stays active
     public float cooldown;
 
+    [Header("OFFSET")]
+    public Vector2 hitboxOffsetRight;
+    public Vector2 hitboxOffsetOverhead;
+    public Vector2 hitboxOffsetLeft;
+    public Vector2 hitboxOffsetLower;
+
+
     [Header("Hitbox")]
-    public Vector2 hitboxSize;      // width and height of attack box
-    public Vector2 hitboxOffset;    // how far in front of player
+    public Vector2 hitboxSizeSideXSide;
+    public Vector2 hitboxSizeOVERHEAD;
+    public Vector2 hitboxSizeLower;
+
 
     [Header("Knockback")]
-    public float knockbackForce;
+    public bool hasKnockback;
+    public float knockbackForceX;
+    public float knockbackForceY;
 
     [Header("Optional")]
     public BuffSO appliedBuff;      // poison sword, fire axe etc

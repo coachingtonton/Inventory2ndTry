@@ -17,6 +17,7 @@ public class InputManager : MonoBehaviour
     public bool spaceHeld;
     public bool wKeyHeld;
 
+    public bool eKeyPressed;
 
     public bool iKeyPressed;
     public bool zKeyPressed;
@@ -47,6 +48,9 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
+        eKeyPressed = Input.GetKeyDown(KeyCode.E);
+
+
         wKeyHeld = Input.GetKey(KeyCode.W);
         spaceHeld = Input.GetKey(KeyCode.Space);
         bkeyHeld = Input.GetKey(KeyCode.B);

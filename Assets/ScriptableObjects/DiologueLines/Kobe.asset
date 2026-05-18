@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17a250ddc161e324c934222ae2facfa5, type: 3}
+  m_Name: Kobe
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueSO
+  lines:
+  - speakerName: TEST 1
+    potrait: {fileID: 133982719826790466, guid: cdde77449b15c0745b269fa461f989a7, type: 3}
+    text: TEST 1
+  - speakerName: TEST 2
+    potrait: {fileID: 21300000, guid: 37abc3aeff8264502939ea79b8a5f194, type: 3}
+    text: TEST 2
+  - speakerName: 
+    potrait: {fileID: 21300000, guid: 37abc3aeff8264502939ea79b8a5f194, type: 3}
+    text: TTEST3
+  - speakerName: TEST 4
+    potrait: {fileID: 21300000, guid: 37abc3aeff8264502939ea79b8a5f194, type: 3}
+    text: TEST 4

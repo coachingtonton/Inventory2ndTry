@@ -13,7 +13,6 @@ public class AbilityHandler : WeaponBase
     [SerializeField] Transform firePoint;
     AbilitySO abilityData;
     float coolDownTimer;
-    float fireTimer; // handles firerate of rapid fire Spells
     BuffManager buffManager;
 
     public override void Awake()
@@ -42,6 +41,8 @@ public class AbilityHandler : WeaponBase
     public override void PrimaryFire()
     {
         if (abilityData == null) return;
+
+        if (coolDownTimer > 0f) return;  // checks cooldown 
 
         if (!playerStats.mana.TrySpend(abilityData.resourceCost))
         {// IF PLAYER CANNOT AFFORD a SPELL's RESOURCE COST
@@ -76,8 +77,6 @@ public class AbilityHandler : WeaponBase
     {
         ///SAME PROJECTILESPAWNING LOGIC AS GUNHANDLER WITH FIELDS FROM ABILITYSO
 
-        if (coolDownTimer > 0f) return;
-        //fireTimer = abilityData.fireRate;//SETS FIRERATE use later
 
         //Some spells will have rapid fire, some will need to be charged like skyrim 
 
@@ -93,6 +92,9 @@ public class AbilityHandler : WeaponBase
         // FOLLOWS FIREPOINT AND INSTANTIATES PROJECTILE.
         Vector2 direction = Quaternion.Euler(0, 0, angle) * firePoint.right;
         GameObject bullet = Instantiate(abilityData.projectilePrefab, firePoint.position, firePoint.rotation);
-        bullet.GetComponent<Projectile>().Init(direction, abilityData.projectileSpeed, abilityData.damage);
+
+        bullet.GetComponent<Projectile>().Init(direction, abilityData.projectileSpeed, abilityData.damage, abilityData.projectileGravity);
+        //Gets projectile componenet on initialization 
+        bullet.transform.localScale = Vector3.one * abilityData.projectileSize;
     }
 }

@@ -10,22 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b12e13b8917fc24ca6894a3c5c655ee, type: 3}
-  m_Name: SpellAbility
+  m_Name: IceSpell
   m_EditorClassIdentifier: Assembly-CSharp::AbilitySO
   count: 1
   itemName: CASTPROJECTUKLE
-  icon: {fileID: 21300000, guid: b6f135359520b4885b98d5ad299587bd, type: 3}
+  icon: {fileID: 21300000, guid: 4e70cd05a0e304940aeeaa167e472f22, type: 3}
   itemType: 0
   weaponType: 2
   damage: 15
   isStackable: 0
   description: 
   abilityType: 0
-  cooldown: 0
+  cooldown: 0.1
   resourceCost: 0
+  projectileSize: 1
   projectilePrefab: {fileID: 6882248276886166810, guid: 85d893d6e6aee7f49a01634be1bf7b51, type: 3}
-  fireRate: -2
-  projectileSpeed: 16
+  projectileSpeed: 45
+  projectileGravity: 0
   projectileCount: 1
   spread: 0
   appliedBuff: {fileID: 0}

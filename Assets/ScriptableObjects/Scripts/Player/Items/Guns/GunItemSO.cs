@@ -7,6 +7,7 @@ public class GunItemSO : ItemSO
     [Header("Gun Stats")]
     public GameObject projectilePrefab;
     public int projectileCount;
+    public float projectileGravity;
     public float spread;
     public float projectileSpeed;
     public int magSize;

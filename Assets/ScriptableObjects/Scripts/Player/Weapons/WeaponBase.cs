@@ -9,6 +9,9 @@ public class WeaponBase : MonoBehaviour
     public ItemSO itemData;
     protected PlayerStats playerStats;
 
+    public virtual bool weaponIsLockingOtherWeaponSelection() => false;
+    // A bool for all handlers to use in equipment manager
+
     public virtual void Awake()
     {
         //Used for handlers that cost resources.
@@ -19,6 +22,7 @@ public class WeaponBase : MonoBehaviour
     {
         itemData = item;
     }
+
 
         public virtual void PrimaryFire() { }
     public virtual void SecondaryFire() { }
