@@ -89,11 +89,17 @@ public class EquipmentManager : MonoBehaviour
         if (InputManager.Instance.ninePressed) Equip(8);
 
         // CURRENTLY EQUIPPED DATA HANDLERS METHODS 
-        if (equippedDataHandler != null && InputManager.Instance.fireHeld)
+        // FIRES THE WEAPON 
+
+        //Fire release is added as well for charged attacks or secondary atrtacks. Without it i had a bug 
+        // that wouldnt read for fire release
+        if (equippedDataHandler != null && InputManager.Instance.fireHeld || InputManager.Instance.fireReleased)
             equippedDataHandler.PrimaryFire();
         if (equippedDataHandler != null && InputManager.Instance.rPressed)
             equippedDataHandler.Reload();
     }
+
+
 
     // CURRENTLY USING THIS FOR TESTING
     //  TODO ::: FIRE THIS ALONG SIDE ITEM PICKED UP EVENT

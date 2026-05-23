@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a7fa8db422b825946b568192381e785a, type: 3}
-  m_Name: Bat
+  m_Name: ChargeBayt
   m_EditorClassIdentifier: Assembly-CSharp::MeleeItemSO
   count: 1
   itemName: Bat
@@ -20,8 +20,8 @@ MonoBehaviour:
   damage: 0
   isStackable: 0
   description: 
-  secondaryAttackScript: {fileID: 11400000, guid: ce9a8dec79f62bf45a65648f521c59ee, type: 2}
-  primaryAttackScript: {fileID: 11400000}
+  secondaryAttackScript: {fileID: 11400000}
+  primaryAttackScript: {fileID: 11400000, guid: 1e475362928e1ca408cd170e7f95f2d1, type: 2}
   attackDuration: 0.07
   windupHitBoxDelay: 0
   hitboxDuration: 0
@@ -35,10 +35,10 @@ MonoBehaviour:
   hitboxSizeSideXSide: {x: 1.78, y: 1.53}
   hitboxSizeOVERHEAD: {x: 2.41, y: 1.69}
   hitboxSizeLower: {x: 2.41, y: 2.13}
-  chargeAttackThreshold: 1.15
+  chargeAttackThreshold: 0.5
   hasKnockback: 1
   knockbackOverhead: {x: 1.18, y: 20.7}
-  knockbackLower: {x: 0, y: -65.2}
+  knockbackLower: {x: 0, y: -150}
   knockbackLeft: {x: -7, y: 10.59}
-  knockbackRight: {x: 24.65, y: 7.01}
+  knockbackRight: {x: 24.65, y: 25}
   appliedBuff: {fileID: 0}

@@ -16,6 +16,8 @@ public class InputManager : MonoBehaviour
     public bool bkeyHeld;
     public bool spaceHeld;
     public bool wKeyHeld;
+    public bool fireReleased;
+
 
     public bool eKeyPressed;
 
@@ -50,7 +52,6 @@ public class InputManager : MonoBehaviour
     {
         eKeyPressed = Input.GetKeyDown(KeyCode.E);
 
-
         wKeyHeld = Input.GetKey(KeyCode.W);
         spaceHeld = Input.GetKey(KeyCode.Space);
         bkeyHeld = Input.GetKey(KeyCode.B);
@@ -59,6 +60,7 @@ public class InputManager : MonoBehaviour
         moveInput = Input.GetAxisRaw("Horizontal");
         jumpPressed = Input.GetKeyDown(KeyCode.Space);
         dashPressed = Input.GetKeyDown(KeyCode.LeftShift);
+        fireReleased = Input.GetMouseButtonUp(0);
         firePressed = Input.GetMouseButtonDown(0);
         fireHeld = Input.GetMouseButton(0);
         interactPressed = Input.GetKeyDown(KeyCode.E);

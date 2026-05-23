@@ -16,9 +16,7 @@ public enum HitboxDirection { Right, Overhead, Left, Lower }
 
 public class MeleeHandler : WeaponBase
 {
-
     HitboxDirection currentDirection;
-
 
     [SerializeField] Transform attackPoint;
     [SerializeField] LayerMask enemyLayer;
@@ -31,6 +29,7 @@ public class MeleeHandler : WeaponBase
     public Vector2 hitboxSize;
     Vector2 hitboxOffset;
     public bool isCurrentlySwinging = false;
+    public float chargeTimer;
 
     public override bool weaponIsLockingOtherWeaponSelection() => isCurrentlySwinging;
     // OVERRIDE FOR ISBUSY, WILL BE USED IN EQUIPMENT MANAGER
@@ -40,14 +39,14 @@ public class MeleeHandler : WeaponBase
     private void Start()
     {
         canAttack = true;
+
     }
 
     private void Update()
     {
         coolDownTimer -= Time.deltaTime;
-        //FlipWeaponHitbox();
         UpdateHitboxDirection();
-        DetermineCurrentHitboxDirection();
+        DetermineCurrentHitboxDirection(CurrentAttack);   // for hitbox/gizmo preview
     }
 
     public override void Equip(ItemSO item)
@@ -65,17 +64,30 @@ public class MeleeHandler : WeaponBase
         if (!canAttack) return;
         //if player is attacking or timer is zero return
 
-        if (canAttack)
+        if (canAttack && InputManager.Instance.fireHeld)
         {
-            Debug.Log("playerSwung");
-            StartCoroutine(SwingAttack());
+            chargeTimer += Time.deltaTime;
         }
+        else if (canAttack && InputManager.Instance.fireReleased )
+        {
+            MeleeItemSO primaryOrSecondary = CurrentAttack; //Stores wether attack was Primary Or Secondary 
+
+            chargeTimer = 0f;
+            StartCoroutine(SwingAttack(primaryOrSecondary)); //This is what causes an attack to happen
+            //PrimaryOrSecondaryFire are stored as ATTACK
+            // SWING ATTACK passes attack to all other methods 
+        }
+        Debug.Log($"called | held: {InputManager.Instance.fireHeld} | released: {InputManager.Instance.fireReleased} | timer: {chargeTimer}");
     }
 
-    public IEnumerator SwingAttack()
+    public IEnumerator SwingAttack(MeleeItemSO primaryOrSecondary)
     {
+        ///SWING ATTACK USES ATTACK DURATION
+        ///ATTACK DURATION IS DETERMINED BY AMOUNT OF TIME MOUSE IS HELD FOR 
+        ///CURRENT ATTACK USES THE SECONDARYATTACK SCRIPT ATTATCHED TO MAIN GAME OBJECT
+
         canAttack = false;
-        coolDownTimer = meleeData.cooldown;
+        coolDownTimer = primaryOrSecondary.cooldown;
         //SETS COOLDOWN TIMER AND ALSO TURNS CAN ATTACK TO FALSE
         // cooldowntimer is a check insidfe primary fire, UPDATE is ticking down the timer
 
@@ -85,8 +97,7 @@ public class MeleeHandler : WeaponBase
 
         float timer = 0f;
 
-
-        while (timer < meleeData.attackDuration)
+        while (timer < primaryOrSecondary.attackDuration)
         {   //WHILE TIMER IS LESS THAN ATTACK DURATION, hitbox will be active 
             //And all damage, knockback effects and status affects will be applied
 
@@ -94,26 +105,21 @@ public class MeleeHandler : WeaponBase
             timer += Time.deltaTime;
             isCurrentlySwinging = true;
 
-            foreach (Collider2D hits in hits)
+            foreach (Collider2D hit in hits)
             {///Goes thru every enemylayer inside activated hitbox HITS ARRAY and applies 
-                ///attack methods and verbs from meleeitemSO.
-                ///Keeps track of enemies hit and allows meleeitem 
-                ///to function as intended 
+             ///attack methods and verbs from meleeitemSO.
+             ///Keeps track of enemies hit and allows meleeitem 
+             ///to function as intended 
 
-                if (enemiesHit.Contains(hits)) continue;
+                if (enemiesHit.Contains(hit)) continue;
                 //IF ENEMY IS ALREADY PRESENT IN HASH SET SKIP REST OF BLOCK
                 //PREVENTS SAME ENEMY BEING DAMAGED OVER DURATION OF HITBOX BEING ACTIVE
 
-                enemiesHit.Add(hits);
+                enemiesHit.Add(hit);
                 //ADDS ENEMY LAYER TO HASHSET
 
-                if (meleeData.hasKnockback)
-                {   //IF MELEE HAS KNOCKBACK, RIGID BODY WILL BE REFRENCED
-                    // FROM HASH SET AND WILL HAVE KNOCKBACK APPLIED 
-                    Rigidbody2D enemyRB = hits.GetComponent<Rigidbody2D>();
-                    ApplyKnockBack(enemyRB, hits);
-                }
-                Debug.Log(hits.name);
+                TryHit(hit, primaryOrSecondary);
+                //RUNS DAMAGE AND HITSOP
             }
             yield return null;
         }
@@ -123,6 +129,28 @@ public class MeleeHandler : WeaponBase
         yield return new WaitForSeconds(coolDownTimer);//I refrence cooldownTimer instead of Meleedata.cooldowntimer 
         // in planning for scaleability, buffs and whatever else
         canAttack = true;
+    }
+
+    void TryHit(Collider2D hit, MeleeItemSO primaryOrSecondary)
+    {
+        ///APPLIES DAMAGE TO THE ENEMY AND APPLIES HITSTOP IF REQUIRED
+        if (hit.TryGetComponent<IDamageable>(out IDamageable enemyIdamageable))
+        {
+            enemyIdamageable.TakeDamage(primaryOrSecondary.damage);
+
+            if (primaryOrSecondary.hasHitStop)
+            {
+                HitStop.instance.Freeze(primaryOrSecondary.hitStopDuration);
+            }
+        }
+        ///APPLIES DAMAGE TO THE ENEMY AND APPLIES HITSTOP IF REQUIRED
+
+        if (primaryOrSecondary.hasKnockback && hit.TryGetComponent<Rigidbody2D>(out Rigidbody2D enemyRB))
+        {   //IF MELEE HAS KNOCKBACK, RIGID BODY WILL BE REFRENCED
+            // FROM HASH SET AND WILL HAVE KNOCKBACK APPLIED 
+            ApplyKnockBack(enemyRB, hit, primaryOrSecondary);
+        }
+        Debug.Log(hit.name);
     }
 
     public void ActivateHitbox()
@@ -138,20 +166,14 @@ public class MeleeHandler : WeaponBase
         if (hits == null) return;
     }
 
-    public void ApplyKnockBack(Rigidbody2D enemyRB, Collider2D hits)
+    public void ApplyKnockBack(Rigidbody2D enemyRB, Collider2D hit, MeleeItemSO primaryOrSecondary)
     {
-        // ADDS KNOCKBACK FORCE DEPENDING ON WHERE PLAYER HITS THE ENEMY
-        // MELEE DATA DETERMINES HOW GNARLY KNOCKBACK FORCE IS
-        Vector2 direction = (hits.transform.position + -attackPoint.position).normalized;
-        direction.y *= meleeData.knockbackForceY;
-        direction.x *= meleeData.knockbackForceX;
+        ///USES CURRENT DIRECTION TO DETERMINE KNOCKBACK OF WEAPON
+        ///WEAPON NEEDS VARIABLE KNOCKBACK SO JUGGLING FEELS GOOOD
+        Vector2 force = GetKnockbackForDirection(primaryOrSecondary);
 
-        enemyRB = hits.GetComponent<Rigidbody2D>();
-        
-        if (enemyRB !=null)
-        {
-            enemyRB.AddForce(direction * knockBackForce, ForceMode2D.Impulse);
-        }
+        enemyRB.linearVelocity = Vector2.zero;
+        enemyRB.AddForce(force, ForceMode2D.Impulse);
     }
 
     void OnDrawGizmos()
@@ -169,9 +191,9 @@ public class MeleeHandler : WeaponBase
     //{
     //    // IF PLAYER IS AIMING IN OPPOSITE DIRECTION HITBOX WILL FLIP 
     //    float aimPos = RotatePoint.localScale.y;
-        /// <summary>
-        /// MAY NO LONGER NEED THIS AS I HAVE OFFSET DETERMINED BY THE SO NOW 
-        /// </summary>
+    /// <summary>
+    /// MAY NO LONGER NEED THIS AS I HAVE OFFSET DETERMINED BY THE SO NOW 
+    /// </summary>
     //    if (aimPos == 1)
     //    {
     //        hitBoxIsFlipped = true;
@@ -180,46 +202,76 @@ public class MeleeHandler : WeaponBase
     //        hitBoxIsFlipped = false;
     //}
 
+    Vector2 GetKnockbackForDirection(MeleeItemSO primaryOrSecondary)
+    {
+        /// SETS THE PROPER KNOCKBACK POWER IN RELATION TO THE HITBOX DIRECTION 
+        switch (currentDirection)
+        {
+            case HitboxDirection.Overhead: return primaryOrSecondary.knockbackOverhead;
+            case HitboxDirection.Lower: return primaryOrSecondary.knockbackLower;
+            case HitboxDirection.Left: return primaryOrSecondary.knockbackLeft;
+            case HitboxDirection.Right: return primaryOrSecondary.knockbackRight;
+            default: return Vector2.zero;
+        }
+    }
+
     public void UpdateHitboxDirection()
     {
+        ///THIS SCRIPT DETERMINES HITBOX DIRECTION BASED ON AIM POINTS ROTATION ALONG Z AXIS 
         if (!canAttack) return; // prevents player from swiotching swing direction after attacking 
 
         float angle = RotatePoint.eulerAngles.z;
-    
-    if (angle >= 52f && angle < 115f)
-        currentDirection = HitboxDirection.Overhead;
-    else if (angle >= 115f && angle < 245f)
-        currentDirection = HitboxDirection.Left;
-    else if (angle >= 245f && angle < 295f)
-        currentDirection = HitboxDirection.Lower;
-    else
-        currentDirection = HitboxDirection.Right;
+
+        if (angle >= 52f && angle < 115f)
+            currentDirection = HitboxDirection.Overhead;
+        else if (angle >= 115f && angle < 245f)
+            currentDirection = HitboxDirection.Left;
+        else if (angle >= 245f && angle < 295f)
+            currentDirection = HitboxDirection.Lower;
+        else
+            currentDirection = HitboxDirection.Right;
     }
 
-    public void DetermineCurrentHitboxDirection()
+    public void DetermineCurrentHitboxDirection(MeleeItemSO primaryOrSecondary)
     {
-        if (meleeData == null) return;
+        if (primaryOrSecondary == null) return;
 
         switch (currentDirection)
         {
             //TAKES in SO's hitbox data so player can have directional swings
 
             case HitboxDirection.Left:
-                hitboxSize = meleeData.hitboxSizeSideXSide;
-                hitboxOffset = meleeData.hitboxOffsetLeft;
+                hitboxSize = primaryOrSecondary.hitboxSizeSideXSide;
+                hitboxOffset = primaryOrSecondary.hitboxOffsetLeft;
                 break;
             case HitboxDirection.Right:
-                hitboxSize = meleeData.hitboxSizeSideXSide;
-                hitboxOffset = meleeData.hitboxOffsetRight;
+                hitboxSize = primaryOrSecondary.hitboxSizeSideXSide;
+                hitboxOffset = primaryOrSecondary.hitboxOffsetRight;
                 break;
             case HitboxDirection.Overhead:
-                hitboxSize = meleeData.hitboxSizeOVERHEAD;
-                hitboxOffset = meleeData.hitboxOffsetOverhead;
+                hitboxSize = primaryOrSecondary.hitboxSizeOVERHEAD;
+                hitboxOffset = primaryOrSecondary.hitboxOffsetOverhead;
                 break;
             case HitboxDirection.Lower:
-                hitboxSize = meleeData.hitboxSizeLower;
-                hitboxOffset = meleeData.hitboxOffsetLower;
+                hitboxSize = primaryOrSecondary.hitboxSizeLower;
+                hitboxOffset = primaryOrSecondary.hitboxOffsetLower;
                 break;
         }
     }
+
+    public MeleeItemSO CurrentAttack
+    {
+        get
+        {
+            if (chargeTimer > meleeData.chargeAttackThreshold)
+            {
+                return meleeData.secondaryAttackScript;
+            }
+            else
+            {
+                return meleeData.primaryAttackScript;
+            }
+        }
+    }
+
 }
