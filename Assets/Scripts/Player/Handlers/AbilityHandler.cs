@@ -76,8 +76,6 @@ public class AbilityHandler : WeaponBase
     public void CastProjectile()
     {
         ///SAME PROJECTILESPAWNING LOGIC AS GUNHANDLER WITH FIELDS FROM ABILITYSO
-
-
         //Some spells will have rapid fire, some will need to be charged like skyrim 
 
         for (int i = 0; i < abilityData.projectileCount; i++)
@@ -93,8 +91,16 @@ public class AbilityHandler : WeaponBase
         Vector2 direction = Quaternion.Euler(0, 0, angle) * firePoint.right;
         GameObject bullet = Instantiate(abilityData.projectilePrefab, firePoint.position, firePoint.rotation);
 
-        bullet.GetComponent<Projectile>().Init(direction, abilityData.projectileSpeed, abilityData.damage, abilityData.projectileGravity);
-        //Gets projectile componenet on initialization 
+        //Creates projectile based off the abilities SO
+        bullet.GetComponent<Projectile>().Init(direction, abilityData.projectileSpeed, abilityData.damage, 
+            abilityData.projectileGravity, abilityData.hitStopDuration, abilityData.impactEffect, abilityData.enemyKnockback);
+        
+        
         bullet.transform.localScale = Vector3.one * abilityData.projectileSize;
+    }
+
+    public void ApplyKnockback()
+    {
+
     }
 }

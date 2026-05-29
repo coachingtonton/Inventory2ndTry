@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 [CreateAssetMenu(fileName = "NewItem", menuName = "1000pRun/Item")]
 public class ItemSO : ScriptableObject
 {
@@ -9,10 +10,11 @@ public class ItemSO : ScriptableObject
     public Sprite icon;
     public ItemType itemType;
     public WeaponType weaponType;
+    public AmmoType ammoType;
     public int damage;
     public bool isStackable;
     [TextArea] public string description;
-
+    public Vector2 enemyKnockback;
 }
 
 public enum ItemType

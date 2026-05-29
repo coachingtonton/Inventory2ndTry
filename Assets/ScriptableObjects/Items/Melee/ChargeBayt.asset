@@ -27,7 +27,7 @@ MonoBehaviour:
   hitboxDuration: 0
   cooldown: 0
   hasHitStop: 1
-  hitStopDuration: 0.07
+  hitStopDuration: 0.19
   hitboxOffsetRight: {x: 0.17, y: 0.24}
   hitboxOffsetOverhead: {x: 0, y: 0.5}
   hitboxOffsetLeft: {x: 0.17, y: 0.24}
@@ -37,8 +37,8 @@ MonoBehaviour:
   hitboxSizeLower: {x: 2.41, y: 2.13}
   chargeAttackThreshold: 0.5
   hasKnockback: 1
-  knockbackOverhead: {x: 1.18, y: 20.7}
-  knockbackLower: {x: 0, y: -150}
-  knockbackLeft: {x: -7, y: 10.59}
-  knockbackRight: {x: 24.65, y: 25}
+  knockbackOverhead: {x: 5, y: 66.7}
+  knockbackLower: {x: 0, y: -100}
+  knockbackLeft: {x: -50, y: 35}
+  knockbackRight: {x: 50, y: 35}
   appliedBuff: {fileID: 0}

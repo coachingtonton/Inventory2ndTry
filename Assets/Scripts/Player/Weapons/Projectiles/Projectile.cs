@@ -6,8 +6,9 @@ public class Projectile : MonoBehaviour
     private BoxCollider2D BoxCollider2D;
     private Rigidbody2D rb;
     int damage;  // lives on the class, survives forever
-
-
+    float hitStopDuration;
+    VFX impactEffect;
+    Vector2 enemyKnockback;
 
     private void Awake()
     {
@@ -20,39 +21,48 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
-    //GUNHANDLER IS gonna use this method
-    // the arguments are for the specific weapons qualities to 
-    // affect the bullets, ammo is the same, weapon determines damage
-
-    /// <summary> This init method is called when a projectile is created
-    /// It sets the properties for the projectile
-    /// Handler spawns projectile -> Handler feeds SO properties to Init -> Desired projectile is created 
-    public void Init(Vector2 direction, float speed, int damage, float gravity)
-    {
+    /// inititializes projectile with data from Scriptable Object
+    /// when handlers create a projectile, the current itemData will be the arguments 
+    public void Init(Vector2 direction, float speed, int damage, float gravity, float hitStopDuration, VFX impactEffect, Vector2 enemyKnockback)
+    { 
+        this.hitStopDuration = hitStopDuration;
         rb.linearVelocity = direction * speed;
-        this.damage = damage;  // THIS STORES GUNHANDLERS GUNITEM SO'S DAMAGE IN THIS 
-        // SCRIPT SO IT CAN BE USED BY OTHER METHODS 
-        
+        this.damage = damage;  
         this.rb.gravityScale = gravity;
-        //SETS gravity for projectile. 
+        this.enemyKnockback = enemyKnockback;
+        this.impactEffect = impactEffect;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Player")) return;
-        //cURRENTL in place to avoid bullet destroying when making player contact
 
-        IDamageable damageable = other.GetComponent<IDamageable>();
-        if (damageable != null)
+        if (hitStopDuration > 0) //CREATES HITSTOP IF ABILITY NEEDS IT {
         {
-            damageable.TakeDamage(damage);
+            HitStop.instance.Freeze(hitStopDuration);
         }
 
-        // try to find a damageable component on whatever we hit
-        // we havent built this yet — placeholder for now
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (damageable != null) ///APPLIES KNOCKBACK AND DAMAGE
+        {
+            damageable.TakeDamage(damage);
+            applyEnemyKnockback(other);
+        }
 
-        Debug.Log($"DEALT {damage} TO {other.gameObject}");
-            
+        VFXManager.Instance.PlayVFX(impactEffect, transform.position);
+
         Destroy(gameObject);
+
+        //DEBUGGING 
+        Debug.Log($"DEALT {damage} TO {other.gameObject}");
+    }
+
+    private void applyEnemyKnockback(Collider2D other)
+    {
+        // Grabs objects rigidbody and proceeds to apply SOs knockback
+        // dir gets the direction of the projectile and forces enemy in direction opposite to that 
+        Vector2 dir = rb.linearVelocity.normalized;
+        if (other.TryGetComponent<Rigidbody2D>(out var enemyRb))
+            enemyRb.AddForce(dir * enemyKnockback, ForceMode2D.Impulse);
     }
 }

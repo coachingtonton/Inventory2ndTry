@@ -20,7 +20,10 @@ MonoBehaviour:
   damage: 15
   isStackable: 0
   description: 
+  impactEffect: 0
   abilityType: 0
+  hasHitStop: 1
+  hitStopDuration: 0.052
   cooldown: 0.1
   resourceCost: 0
   projectileSize: 1
@@ -32,3 +35,5 @@ MonoBehaviour:
   appliedBuff: {fileID: 0}
   duration: 0
   areaRadius: 0
+  knockback: 0
+  recoil: 0

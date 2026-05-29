@@ -9,7 +9,14 @@ public enum AbilityType
 [CreateAssetMenu(fileName = "New Ability", menuName = "Items/Ability")]
 public class AbilitySO : ItemSO
 {
+    [Header("IMPACT EFFECTS")]
+    public VFX impactEffect;
+
     public AbilityType abilityType;
+
+    [Header("HitStop")]
+    public bool hasHitStop;
+    public float hitStopDuration;
 
     [Header("Shared")]
     public float cooldown;
@@ -27,4 +34,8 @@ public class AbilitySO : ItemSO
     public BuffSO appliedBuff;
     public float duration;
     public float areaRadius;
+
+    [Header("KNOCKBACK AND RECOIL")]
+    public float knockback;
+    public float recoil;
 }

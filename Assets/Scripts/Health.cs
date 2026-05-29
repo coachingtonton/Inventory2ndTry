@@ -9,6 +9,8 @@ public class Health : MonoBehaviour, IDamageable
     public event Action OnDeath;
     public event Action onHealthChanged;
 
+    public event Action onHealthDamaged; //HitEffect manager will refrence this one
+
     public void Awake()
     {
         health.OnDepleted += () => OnDeath?.Invoke();
@@ -27,6 +29,8 @@ public class Health : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         health.Spend(amount);
+        onHealthChanged?.Invoke();
+        onHealthDamaged?.Invoke();
     }
 
     public void HealthChanged()

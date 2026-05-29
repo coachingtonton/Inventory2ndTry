@@ -24,7 +24,7 @@ public class WeaponBase : MonoBehaviour
     }
 
 
-        public virtual void PrimaryFire() { }
+    public virtual void PrimaryFire() { }
     public virtual void SecondaryFire() { }
     public virtual void Reload() { }
 }

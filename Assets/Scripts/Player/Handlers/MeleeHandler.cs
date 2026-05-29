@@ -10,6 +10,12 @@ using System;
 /// This results in air combat and lower combat like smash bros without the inputs
 /// Also takes in melee SOs knockback power as well as other qualities of indiviual weapons.
 /// Hitbox size will be determined by meleeitemSO
+/// 
+/// secondary attack secondary attack 
+/// SECONDARY ATTACK IS DETERMINED BY CurrentAttack PROPERTY
+/// if mouse is released before secondary attack threshold CurrentAttack property
+/// 
+/// 
 /// </summary>
 
 public enum HitboxDirection { Right, Overhead, Left, Lower }
@@ -263,6 +269,8 @@ public class MeleeHandler : WeaponBase
     {
         get
         {
+            if (meleeData == null) return null;
+
             if (chargeTimer > meleeData.chargeAttackThreshold)
             {
                 return meleeData.secondaryAttackScript;

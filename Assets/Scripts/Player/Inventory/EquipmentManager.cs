@@ -93,10 +93,15 @@ public class EquipmentManager : MonoBehaviour
 
         //Fire release is added as well for charged attacks or secondary atrtacks. Without it i had a bug 
         // that wouldnt read for fire release
+        if (equippedDataHandler == null) return;
+
         if (equippedDataHandler != null && InputManager.Instance.fireHeld || InputManager.Instance.fireReleased)
-            equippedDataHandler.PrimaryFire();
+                equippedDataHandler.PrimaryFire();
+        if (equippedDataHandler != null && InputManager.Instance.rightClickHeld || InputManager.Instance.rightClickReleased)
+            equippedDataHandler.SecondaryFire();
         if (equippedDataHandler != null && InputManager.Instance.rPressed)
-            equippedDataHandler.Reload();
+                equippedDataHandler.Reload();
+
     }
 
 

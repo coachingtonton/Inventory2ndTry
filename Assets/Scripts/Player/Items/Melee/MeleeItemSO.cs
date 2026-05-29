@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class MeleeItemSO : ItemSO
 {
+    [Header("IMPACT EFFECTS")]
+    public VFX impactEffect;
+
     [Header("OTHER ATTACKS")]
     public MeleeItemSO secondaryAttackScript;
     public MeleeItemSO primaryAttackScript;
@@ -37,7 +40,6 @@ public class MeleeItemSO : ItemSO
 
     [Header("ChargeAttack")]
     public float chargeAttackThreshold;
-
 
     [Header("Knockback")]
     public bool hasKnockback;
