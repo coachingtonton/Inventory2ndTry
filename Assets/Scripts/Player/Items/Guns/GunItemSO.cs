@@ -32,6 +32,7 @@ public class GunItemSO : ItemSO
     public bool hasPlayerRecoil;
 
     [Header("Projectiles")]
+    public float projectileSize;
     public float projectileSpeed;
     public float projectileGravity;
     public GameObject projectilePrefab;

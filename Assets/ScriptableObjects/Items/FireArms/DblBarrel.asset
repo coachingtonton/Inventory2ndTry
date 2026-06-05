@@ -27,7 +27,7 @@ MonoBehaviour:
   primaryAttackScript: {fileID: 11400000}
   weaponDamage: 0
   fireRate: 0.2
-  spread: 2
+  spread: 5.11
   secondaryFireAmmoCost: 2
   reloadTime: 0
   magSize: 2
@@ -37,9 +37,10 @@ MonoBehaviour:
   playerRecoil: 7
   inAirPlayerRecoil: 15
   hasPlayerRecoil: 1
-  projectileSpeed: 50
+  projectileSize: 0.4
+  projectileSpeed: 84.1
   projectileGravity: 0
   projectilePrefab: {fileID: 6882248276886166810, guid: 85d893d6e6aee7f49a01634be1bf7b51, type: 3}
-  projectileCount: 10
+  projectileCount: 25
   hasHitStop: 1
   hitStopDuration: 0.02

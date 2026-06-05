@@ -3,6 +3,7 @@ using System;
 
 public class FirePointRotator : MonoBehaviour
 {
+    [SerializeField] private Vector3 firePointOffset = new Vector3(0f, 0.5f, 0f);
     [SerializeField] private Transform playerTransform;
     MeleeHandler meleeHandler;
 
@@ -21,8 +22,8 @@ public class FirePointRotator : MonoBehaviour
 
     private void Update()
     {
-        // Follow player position
-        transform.position = playerTransform.position;
+        // Follow player position, added offset to account for player sprite
+        transform.position = playerTransform.position + firePointOffset;
 
         if (!meleeHandler.isCurrentlySwinging)
         {

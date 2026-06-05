@@ -15,7 +15,7 @@ TagManager:
   - PlayerProjectile
   - wall
   - Enemy
-  - 
+  - Reflection
   - 
   - 
   - 
@@ -40,6 +40,15 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Floor
+    uniqueID: 2188644069
+    locked: 0
+  - name: Reflection
+    uniqueID: 2729665373
+    locked: 0
+  - name: Player
+    uniqueID: 3689763537
     locked: 0
   m_RenderingLayers:
   - Default

@@ -13,9 +13,6 @@ using System.Collections;
 public class GodStateScript : MonoBehaviour
 {
 
-
-
-
     /// NORMAL STATE NORMAL STATE NORMAL STATE NORMAL STATE NORMAL STATE NORMAL STATE 
     public class NormalState : IState
     {
@@ -55,7 +52,41 @@ public class GodStateScript : MonoBehaviour
 
 
 
+    /// CLING STATE CLING STATE  CLING STATE CLING STATE  CLING STATE CLING STATE  CLING STATE CLING STATE  CLING STATE CLING STATE 
+    public class ClingState : IState
+    {
+        private PlayerStateController player;
 
+        public ClingState(PlayerStateController player)
+        {
+            this.player = player;
+        }
+
+        public void Enter()
+        {
+            // pin to wall: cut gravity and stop any vertical motion
+            player.rb.gravityScale = 0f;
+            player.rb.linearVelocity = new Vector2(player.rb.linearVelocity.x, 0f);
+            Debug.Log("ENTERED CLING STATE");
+        }
+
+        public void Update()
+        {
+            player.FlipSpriteToPlayerInput();
+
+            // hold the player stuck to the wall — keep cancelling vertical drift
+            player.rb.linearVelocity = new Vector2(0f, 0f);
+        }
+
+        public void Exit()
+        {
+            // give gravity back so falling/sliding works normally again
+            player.rb.gravityScale = player.regularGravity;
+            Debug.Log("EXITED CLING STATE");
+        }
+    }
+    /// CLING STATE CLING STATE  CLING STATE CLING STATE  CLING STATE CLING STATE  CLING STATE CLING STATE  CLING STATE CLING STATE 
+}
 
 
     /// JUMPING STATE JUMPING STATE  JUMPING STATE JUMPING STATE JUMPING STATE JUMPING JUMPING STATE JUMPING STATEJUMPING STATE JUMPING STATEJUMPING STATE JUMPING STATE
@@ -91,11 +122,6 @@ public class GodStateScript : MonoBehaviour
         }
 
     }/// JUMPING STATE JUMPING STATE  JUMPING STATE JUMPING STATE JUMPING STATE JUMPING  JUMPING STATE JUMPING STATE JUMPING STATE JUMPING STATE
-
-
-
-
-
 
 
 
@@ -323,5 +349,5 @@ public class GodStateScript : MonoBehaviour
 
         }
     }
-}
+
 

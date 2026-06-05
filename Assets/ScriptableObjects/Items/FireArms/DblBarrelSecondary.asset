@@ -37,9 +37,10 @@ MonoBehaviour:
   playerRecoil: 7
   inAirPlayerRecoil: 30
   hasPlayerRecoil: 1
+  projectileSize: 0.4
   projectileSpeed: 50
   projectileGravity: 0
   projectilePrefab: {fileID: 6882248276886166810, guid: 85d893d6e6aee7f49a01634be1bf7b51, type: 3}
-  projectileCount: 20
+  projectileCount: 25
   hasHitStop: 1
   hitStopDuration: 0.02

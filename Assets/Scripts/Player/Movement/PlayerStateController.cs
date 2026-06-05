@@ -8,6 +8,10 @@ public class PlayerStateController : MonoBehaviour
 
     private Coroutine repeatingWallJumpCoroutine;
 
+    #region FIELDS
+
+
+
     [Header("Movement - Ground")]
     public float maxSpeed = 10f;
     public float groundAcceleration = 30f;
@@ -91,13 +95,18 @@ public class PlayerStateController : MonoBehaviour
     public JumpingState jumpingState;
     public FloatState floatState;
     public TouchingWallStates touchingWallState;
+    public ClingState clingState;
 
     /// DATA CHECKS
     public bool isGrounded { get; private set; }
     public bool wallTouchingRear { get; private set; }
     public bool wallTouchingFront { get; private set; }
     public bool isTouchingWall { get; private set; }
+    public bool isRising { get; private set; }
+    public bool isFallinginAir { get; private set; }
+
     public float wallJumpDirection;
+    #endregion FIELDS
 
 
     private void Awake()
@@ -113,7 +122,6 @@ public class PlayerStateController : MonoBehaviour
         rb.gravityScale = rb.gravityScale;
         currentState = normalState;
         currentState.Enter();//manualy calls enter on first state
-
     }
 
     private void Update()
@@ -139,7 +147,6 @@ public class PlayerStateController : MonoBehaviour
         currentState.Enter();
     }
 
-
     public void HandleTransitions()
     { // SIMPLE switch for what causes a transition from one state to another
       // PLAYER STARTS IN NORMAL STATE  
@@ -149,6 +156,7 @@ public class PlayerStateController : MonoBehaviour
         {
             /// =============NORMAL TRANSITIONS ============
             case NormalState:
+
                 if (InputManager.Instance.jumpPressed && isGrounded)
                     ChangeState(jumpingState);
                 if (!isGrounded)
@@ -161,6 +169,7 @@ public class PlayerStateController : MonoBehaviour
 
 
             /// =============JUMPING TRANSITIONS ============
+             
             case JumpingState:
                 ChangeState(fallingState);
                 if (isTouchingWall)
@@ -192,16 +201,31 @@ public class PlayerStateController : MonoBehaviour
 
             /// ============= TOUCHING WALL STATE ============
             case TouchingWallStates:
-                if (!isTouchingWall && !repeatingWallJump)
-                    ChangeState(fallingState);
+
                 if (isGrounded)
                     ChangeState(normalState);
-                if (!holdingIntoWall && isTouchingWall)  // not holding in = start sliding
-                    ChangeState(wallSlideState);
+                else if (!isTouchingWall && !repeatingWallJump)
+                    ChangeState(fallingState);
+                else if (isTouchingWall && holdingIntoWall)
+                    ChangeState(clingState);          // grabbing → cling
+                else if (!holdingIntoWall && isTouchingWall)
+                    ChangeState(wallSlideState);      // not grabbing → slide
                 break;
 
-                /// ============= WALL SLIDING STATE ============
-             case WallSlideState:
+            /// ============= CLING STATE CLING STATE ============
+            case ClingState:
+                if (isGrounded)
+                    ChangeState(normalState);
+                else if (!isTouchingWall)
+                    ChangeState(fallingState);            // wall ended / let go off edge
+                else if (!holdingIntoWall)
+                    ChangeState(wallSlideState);          // released grab → slide down
+                else if (InputManager.Instance.jumpPressed)
+                    ChangeState(touchingWallState);       // jump off → wall jump logic
+                break;
+
+            /// ============= WALL SLIDING STATE ============
+            case WallSlideState:
                 if (!isTouchingWall)
                     ChangeState(fallingState);
                 if (isGrounded)
@@ -210,6 +234,8 @@ public class PlayerStateController : MonoBehaviour
                     ChangeState(touchingWallState);
                 if (moveInput != 0 && !holdingIntoWall)  // tap opposite direction = leave wall
                     ChangeState(fallingState);
+                if (holdingIntoWall)
+                    ChangeState(clingState);
                 break;
         }
     }
@@ -222,8 +248,8 @@ public class PlayerStateController : MonoBehaviour
         jumpingState = new JumpingState(this);
         floatState = new FloatState(this);
         touchingWallState = new TouchingWallStates(this);
+        clingState = new ClingState(this);
     }
-
 
     public void SurfaceChecks()
     {
@@ -237,8 +263,13 @@ public class PlayerStateController : MonoBehaviour
         holdingIntoWall = isTouchingWall && moveInput == 1 || isTouchingWall && moveInput == -1;
         if (isTouchingWall)
             wallJumpDirection = wallTouchingFront ? -1f : 1f;
-    }
 
+        if (rb.linearVelocity.y > 0.01f)
+            { isRising = true; isFallinginAir = false; }
+        else
+            {isRising = false; isFallinginAir = true; }
+
+    }
 
     public void FlipSpriteToPlayerInput()
     {   //SIMPLPE player flip script, ALSO Records player input horizontal
@@ -253,7 +284,6 @@ public class PlayerStateController : MonoBehaviour
             transform.localScale = new Vector3(-1, 1, 1);
         }
     }
-
 
     public void ResetJumpsIfGrounded()
     {// PROTOTYPE SYSTEM FOR RESETTING JUMPS FOR NOW
@@ -310,4 +340,6 @@ public class PlayerStateController : MonoBehaviour
         }
         repeatingWallJump = false;
     }
+
+
 }

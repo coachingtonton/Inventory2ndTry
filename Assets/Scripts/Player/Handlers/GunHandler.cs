@@ -142,6 +142,8 @@ public class GunHandler : WeaponBase
         bullet.GetComponent<Projectile>().Init(direction, PrimaryOrSecondaryAttack.projectileSpeed, PrimaryOrSecondaryAttack.damage,
             PrimaryOrSecondaryAttack.projectileGravity, PrimaryOrSecondaryAttack.hitStopDuration,
             PrimaryOrSecondaryAttack.impactEffect, PrimaryOrSecondaryAttack.enemyKnockback);
+
+        bullet.transform.localScale = Vector3.one * PrimaryOrSecondaryAttack.projectileSize;
     }
 
     public void ApplyPlayerBodyRecoil()
